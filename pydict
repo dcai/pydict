@@ -1,0 +1,172 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+########################################################################
+#                                                                      #
+# PyDict - a python client for Dict.CN                                 #
+#                                                                      #
+# Copyright (C)2008-2008 Dongsheng Cai                                 #
+#                                                                      #
+########################################################################
+#                                                                      #
+# This program is free software; you can redistribute it and/or modify #
+# it under the terms of the GNU General Public License as published by #
+# the Free Software Foundation; either version 2 of the License, or    #
+# (at your option) any later version.                                  #
+#                                                                      #
+# This program is distributed in the hope that it will be useful,      #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of       #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the        #
+# GNU General Public License for more details.                         #
+#                                                                      #
+########################################################################
+
+import sys
+import urllib
+import urllib2
+import codecs
+import re
+import xml.dom.minidom
+from htmlentitydefs import name2codepoint
+
+app_name     = 'PyDict';
+version      = '0.1';
+author       = 'Dongsheng Cai';
+author_email = 'me@anbutu.com';
+
+# ANSI sequences for colours
+CLR_SEQ = {
+    'white'       : "\033[1;37m",
+    'yellow'      : "\033[1;33m",
+    'green'       : "\033[1;32m",
+    'blue'        : "\033[1;34m",
+    'cyan'        : "\033[1;36m",
+    'red'         : "\033[1;31m",
+    'magenta'     : "\033[1;35m",
+    'black'       : "\033[1;30m",
+    'darkwhite'   : "\033[0;37m",
+    'darkyellow'  : "\033[0;33m",
+    'darkgreen'   : "\033[0;32m",
+    'darkblue'    : "\033[0;34m",
+    'darkcyan'    : "\033[0;36m",
+    'darkred'     : "\033[0;31m",
+    'darkmagenta' : "\033[0;35m",
+    'darkblack'   : "\033[0;30m",
+    'off'         : "\033[0;0m"
+}
+
+def translate(entity):
+    ent = entity.group(2)
+    print "code: "+ ent
+    print entity.group(1)
+    if entity.group(1) == "#":
+        return unichr(int(ent))
+    else:
+        cp = name2codepoint.get(ent)
+        if cp:
+            return unichr(cp)
+        else:
+            return match.group()
+def format(cell):
+    cell['word'] = color(cell['word'], 'red')
+    print cell['word']
+    if cell['pron']:
+        cell['pron'] = color(cell['pron'], 'blue')
+        print '[' + cell['pron'] + ']'
+    for i in cell['def']:
+        i = color(i.lower(), 'darkyellow');
+        print i
+    print '============'
+    for i in cell['sentences']:
+        print 'O: ' + color(i['o'], 'darkcyan')
+        print 'T: ' + color(i['t'], 'darkmagenta')
+        print '======'
+    return cell
+def color(str, clr):
+    if not clr:
+        return str;
+    else:
+        return CLR_SEQ[clr] + str + CLR_SEQ['off']
+
+def pydict(w):
+    dict = factory('dictcn')
+    result = dict.get_result(w)
+    format(result)
+    #xml = response.read()
+    #xml = unicode(xml.decode('utf-8'))
+    #res = re.compile('&(#?)(\d{1,5}|\w{5-8});');
+    #output = res.sub(translate, xml)
+    #rel   = doc.getElementsByTagName('rel')[0].firstChild.data
+    #audio = doc.getElementsByTagName('audio')[0].firstChild.data
+class dictcn(object):
+    def __init__(self):
+        self.result = {}
+        self.name = 'Dict.CN'
+        self.url = 'http://dict.cn/ws.php'
+        self.values = {
+            'q': '',
+            'utf8':'true'
+        }
+        print 'From Dict.CN'
+        print '============'
+    def get_origin(self, word):
+        self.values['q'] = word;
+        self.data = urllib.urlencode(self.values)
+        self.req  = urllib2.Request(self.url, self.data)
+        try:
+            self.origin = urllib2.urlopen(self.req)
+        except HTTPError, e:
+            print 'The server couldnot fulfill the request.'
+            print 'Error code:', e.code
+        except URLError, e:
+            print 'Failed to reach a server.'
+            print 'Reason:', e.reason
+        return self.origin
+
+    def process(self, response):
+        doc = xml.dom.minidom.parse(response)
+        pron  = doc.getElementsByTagName('pron')
+        if pron:
+            self.result['pron'] = pron[0].firstChild.data;
+        else:
+            self.result['pron'] = '';
+        # def element is always contained, so no worries,
+        # Just ues it
+        exps  = doc.getElementsByTagName('def')[0].firstChild.data.split('\n')
+        self.result['def'] = []
+        for exp in exps:
+            self.result['def'].append(exp)
+        self.result['sentences'] = []
+        sents = doc.getElementsByTagName('sent')
+        s = self.result['sentences']
+        for sent in sents:
+            s.append({})
+            s[len(s)-1]['o'] = sent.getElementsByTagName('orig')[0].firstChild.data
+            s[len(s)-1]['t'] = sent.getElementsByTagName('trans')[0].firstChild.data
+
+    def get_result(self, word):
+        self.result['word'] = word
+        self.get_origin(word)
+        if self.origin:
+            self.process(self.origin)
+        if self.result:
+            return self.result
+        else:
+            return {}
+
+class stardict(object):
+    def __init__(self):
+        pass
+    def get_result(self):
+        pass
+
+def factory(dict):
+    return eval(dict+"()")
+
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print u'Dict.CN (Python client): No arguments entered.'
+        sys.exit(0)
+    else:
+        searchword = sys.argv[1]
+    pydict(searchword);
