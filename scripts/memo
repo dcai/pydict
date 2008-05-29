@@ -1,0 +1,15 @@
+#!/bin/bash
+
+WORD_FILE=~/dic.txt
+
+if [ -f ~/.memo ]; then
+    . ~/.memo
+fi
+
+if [ ! -f $WORD_FILE ]; then
+    echo "$WORD_FILE: File Not Exist."
+    exit -1
+fi
+
+pydict $( head -$(( $RANDOM % $( wc -l $WORD_FILE | cut -d " " -f 1 ) + 1 )) $WORD_FILE | tail -1 )
+
