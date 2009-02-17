@@ -50,8 +50,8 @@ class dict(object):
         s = self.result['sentences']
         for sent in sents:
             s.append({})
-            s[len(s)-1]['o'] = sent.getElementsByTagName('orig')[0].firstChild.data
-            s[len(s)-1]['t'] = sent.getElementsByTagName('trans')[0].firstChild.data
+            s[len(s)-1]['o'] = sent.getElementsByTagName('orig')[0].firstChild.data.strip()
+            s[len(s)-1]['t'] = sent.getElementsByTagName('trans')[0].firstChild.data.strip()
 
     def get_result(self, word):
         self.result['word'] = word
