@@ -83,13 +83,13 @@ def pydict(dict_type, options):
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print u'Dict.CN (Python client): No arguments entered.'
+        print u'PyDict: No arguments entered.'
         sys.exit(0)
     else:
         searchword = sys.argv[1]
 	
 	config = ConfigParser.RawConfigParser()
-	config.read('dict.ini')
+	config.read(sys.path[0] + '/dict.ini')
 	dict_type = config.get('pydict', 'type')
 	dict_data = config.get('pydict', 'dict')
     options = {}

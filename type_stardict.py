@@ -3,6 +3,7 @@
 import string
 import re
 import gzip
+import sys
 from struct import *
 
 class dict(object):
@@ -10,10 +11,11 @@ class dict(object):
         print 'From StarDict'
         print '============'
         name = options['dict_data']
+        p = sys.path[0] + '/'
         files = {
-                'inf_file': name + '/' + name + '.ifo',
-                'idx_file': name + '/' + name + '.idx',
-                'dic_file': name + '/' + name + '.dict'
+                'inf_file': p + name + '/' + name + '.ifo',
+                'idx_file': p + name + '/' + name + '.idx',
+                'dic_file': p + name + '/' + name + '.dict'
                 }
         self.engine = stardict_engine(files)
     def get_result(self, word):
