@@ -1,13 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import codecs
 import urllib
 import urllib2
-import codecs
 import re
 import xml.dom.minidom
 
-class dict(object):
+class plugin_dict(object):
     def __init__(self, options):
         self.result = {}
         self.name = 'Dict.CN'
@@ -16,20 +16,19 @@ class dict(object):
             'q': '',
             'utf8':'true'
         }
-        print 'From Dict.CN'
-        print '============'
+        print('From Dict.CN')
+        print('============')
     def get_origin(self, word):
         self.values['q'] = word;
         self.data = urllib.urlencode(self.values)
-        self.req  = urllib2.Request(self.url, self.data)
         try:
-            self.origin = urllib2.urlopen(self.req)
-        except HTTPError, e:
-            print 'The server couldnot fulfill the request.'
-            print 'Error code:', e.code
-        except URLError, e:
-            print 'Failed to reach a server.'
-            print 'Reason:', e.reason
+            self.origin = urllib.urlopen(self.url, self.data)
+        except (HTTPError, e):
+            print('The server couldnot fulfill the request.')
+            print('Error code:', e.code)
+        except (URLError, e):
+            print('Failed to reach a server.')
+            print('Reason:', e.reason)
         return self.origin
 
     def process(self, response):

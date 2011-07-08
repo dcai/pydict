@@ -5,7 +5,7 @@
 #                                                                      #
 # PyDict - a python client for Dict.CN                                 #
 #                                                                      #
-# Copyright (C)2008-2008 Dongsheng Cai                                 #
+# Copyright (C)2008-2011 Dongsheng Cai                                 #
 #                                                                      #
 ########################################################################
 #                                                                      #
@@ -27,7 +27,7 @@ import ConfigParser
 app_name     = 'PyDict';
 version      = '0.2';
 author       = 'Dongsheng Cai';
-author_email = 'me@dongsheng.org';
+author_email = 'imdongsheng@gmail.com';
 
 # ANSI sequences for colours
 CLR_SEQ = {
@@ -52,20 +52,22 @@ CLR_SEQ = {
 
 def format(cell):
     cell['word'] = color(cell['word'], 'red')
-    print cell['word']
-    if cell.has_key('pron'):
-        cell['pron'] = color(cell['pron'], 'blue')
-        print '[' + cell['pron'] + ']'
-    for i in cell['def']:
-        i = color(i.lower(), 'darkyellow');
-        print i
-    print '============'
+    print(cell['word'])
+    key = 'pron'
+    if 'def' in cell:
+        if key in cell:
+            cell['pron'] = color(cell['pron'], 'blue')
+            print('[' + cell['pron'] + ']')
+        for i in cell['def']:
+            i = color(i.lower(), 'darkyellow');
+            print(i)
+        print('============')
 
-    if cell.has_key('sentences'):
+    if 'sentences' in cell:
         for i in cell['sentences']:
-            print 'O: ' + color(i['o'], 'darkcyan')
-            print 'T: ' + color(i['t'], 'darkmagenta')
-            print '======'
+            print('O: ' + color(i['o'], 'darkcyan'))
+            print('T: ' + color(i['t'], 'darkmagenta'))
+            print('======')
 
     return cell
 
@@ -76,26 +78,26 @@ def color(str, clr):
         return CLR_SEQ[clr] + str + CLR_SEQ['off']
 
 def pydict(dict_type, options):
-    exec "from type_" + dict_type + " import dict"
-    dict_engine = dict(options)
+    dict_type = "plugin_" + dict_type
+    exec "from " + dict_type + " import plugin_dict"
+    dict_engine = plugin_dict(options)
     result = dict_engine.get_result(options['word'])
     format(result)
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print u'PyDict: No arguments entered.'
+        str = 'PyDict: No arguments entered.'
+        print(str)
         sys.exit(0)
     else:
         searchword = sys.argv[1]
-	
-	config = ConfigParser.RawConfigParser()
-	config.read(sys.path[0] + '/dict.ini')
-	dict_type = config.get('pydict', 'type')
-	dict_data = config.get('pydict', 'dict')
+        config = ConfigParser.RawConfigParser()
+        config.read(sys.path[0] + '/dict.ini')
+        dict_type = config.get('pydict', 'type')
+        dict_data = config.get('pydict', 'dict')
     options = {}
     options['word'] = searchword
     options['dict_data'] = dict_data
     if not dict_type:
         dict_type = 'dictcn'
     pydict(dict_type, options);
-

@@ -1,16 +1,12 @@
-README
-------
+## README
 
-INSTALL
-=============
+### INSTALL
 See INSTALL
 
-TO-DO
-=============
+### TO-DO
 * Use stardict dictionary
 * Save user's query
 * Get audio file and play
 
-BUGS
-=============
-* HTTP Connections timeout
+### BUGS
+* Handle HTTP Connections timeout

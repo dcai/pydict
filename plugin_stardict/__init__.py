@@ -6,7 +6,7 @@ import gzip
 import sys
 from struct import *
 
-class dict(object):
+class mydict(object):
     def __init__(self, options):
         print 'From StarDict'
         print '============'
