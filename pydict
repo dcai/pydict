@@ -27,7 +27,7 @@ import ConfigParser
 app_name     = 'PyDict';
 version      = '0.2';
 author       = 'Dongsheng Cai';
-author_email = 'imdongsheng@gmail.com';
+author_email = 'd@tux.im';
 
 # ANSI sequences for colours
 CLR_SEQ = {

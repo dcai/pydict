@@ -1,4 +1,6 @@
-## README
+## DEPRECATED
+
+DICT.CN web service is closed, this project no longer gets updates.
 
 ### INSTALL
 See INSTALL
